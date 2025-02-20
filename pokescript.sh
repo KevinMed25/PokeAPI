@@ -1,5 +1,3 @@
-# #!/bin/bash
-
 # Verificar si se proporcionó al menos un parámetro
 if [ "$#" -eq 0 ]; then
     echo "Error: Debes proporcionar al menos un nombre de Pokémon."
@@ -9,7 +7,7 @@ fi
 
 CSV_FILE="pokemon_data.csv"
 
-# Verificar si el archivo CSV existe, si no, agregar encabezado
+# Verificar si el archivo CSV existe o agregar encabezado
 if [ ! -f "$CSV_FILE" ]; then
     echo "id,name,weight,height,order" > "$CSV_FILE"
 fi
@@ -22,7 +20,7 @@ for POKEMON_NAME in "$@"; do
     # Validar que la entrada contenga solo letras y guiones (sin números ni caracteres especiales)
     if [[ ! "$POKEMON_NAME" =~ ^[a-zA-Z-]+$ ]]; then
         echo "Error: '$POKEMON_NAME' no es un nombre válido. Solo se permiten letras y guiones."
-        continue  # Saltar al siguiente Pokémon
+        continue
     fi
 
     API_URL="https://pokeapi.co/api/v2/pokemon/$POKEMON_NAME"
@@ -35,7 +33,7 @@ for POKEMON_NAME in "$@"; do
     if [ "$HTTP_STATUS" -ne 200 ]; then
         echo "Error: No se encontró el Pokémon '$POKEMON_NAME' o hubo un problema con la API."
         rm -f response.json  # Eliminar archivo temporal si no es válido
-        continue  # Saltar al siguiente Pokémon
+        continue
     fi
 
     # Extraer datos usando jq
@@ -45,7 +43,7 @@ for POKEMON_NAME in "$@"; do
     HEIGHT=$(jq -r '.height' response.json)
     ORDER=$(jq -r '.order' response.json)
 
-    # Imprimir los datos en el formato deseado
+    # Imprimir los datos
     echo "$NAME (No. $ID)"
     echo "Id = $ID"
     echo "Weight = $WEIGHT"
@@ -53,7 +51,7 @@ for POKEMON_NAME in "$@"; do
     echo "Order = $ORDER"
     echo "---------------------------"
 
-    # Guardar los datos en el archivo CSV
+    # Guardar los datos en el CSV
     echo "$ID,$NAME,$WEIGHT,$HEIGHT,$ORDER" >> "$CSV_FILE"
 
     # Eliminar el archivo temporal
